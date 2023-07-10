@@ -1,10 +1,7 @@
 <?php
 
-use App\Http\Controllers\Backend\AdminController;
-use App\Http\Controllers\Backend\VendorController;
-use App\Http\Controllers\Frontend\HomeController;
-use App\Http\Controllers\Frontend\UserDashboardController;
-use App\Http\Controllers\Frontend\UserProfileController;
+use App\Http\Controllers\Backend;
+use App\Http\Controllers\Frontend;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', [HomeController::class, 'index'])->name('index');
+Route::get('/', [Frontend\HomeController::class, 'index'])->name('index');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -30,17 +27,16 @@ Route::middleware('auth')->group(function () {
 require __DIR__.'/auth.php';
 
 /** Admin Routes */
-Route::get('/admin/login', [AdminController::class, 'login'])->name('admin.login');
-
-
+Route::get('/admin/login', [Backend\AdminController::class, 'login'])->name('admin.login');
 /** Vendor Routes */
-Route::get('/vendor/login', [VendorController::class, 'login'])->name('vendor.login');
+Route::get('/vendor/login', [Backend\VendorController::class, 'login'])->name('vendor.login');
 
+Route::get('flash-sale', [Frontend\FlashSaleController::class, 'index'])->name('flash-sale');
 
 
 Route::middleware(['auth', 'verified'])->prefix('user')->as('user.')->group(function () {
-    Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
-    Route::get('/profile', [UserProfileController::class, 'index'])->name('profile');
-    Route::put('/profile', [UserProfileController::class, 'updateProfile'])->name('profile.update');
-    Route::post('/profile', [UserProfileController::class, 'updatePassword'])->name('profile.update.password');
+    Route::get('/dashboard', [Frontend\UserDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/profile', [Frontend\UserProfileController::class, 'index'])->name('profile');
+    Route::put('/profile', [Frontend\UserProfileController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/profile', [Frontend\UserProfileController::class, 'updatePassword'])->name('profile.update.password');
 });
