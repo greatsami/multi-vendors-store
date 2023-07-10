@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Backend;
 
-use App\DataTables\ProductVariantItemDataTable;
+use App\DataTables\VendorProductVariantItemDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductVariant;
@@ -12,10 +12,13 @@ use Illuminate\Http\Request;
 class VendorProductVariantItemController extends Controller
 {
 
-    public function index(ProductVariantItemDataTable $dataTable, $productId, $variantId)
+    public function index(VendorProductVariantItemDataTable $dataTable, $productId, $variantId)
     {
         $product = Product::findOrFail($productId);
         $variant = ProductVariant::findOrFail($variantId);
+        if ($product->vendor_id !== auth()->user()->vendor->id) {
+            abort(404);
+        }
         return $dataTable->render('vendor.products.variant-items.index', compact('product', 'variant'));
     }
 
@@ -56,11 +59,19 @@ class VendorProductVariantItemController extends Controller
 
     public function edit(ProductVariantItem $productVariantItem)
     {
+        if ($productVariantItem->product->vendor_id !== auth()->user()->vendor->id) {
+            abort(404);
+        }
+
         return view('vendor.products.variant-items.edit', compact('productVariantItem'));
     }
 
     public function update(Request $request, ProductVariantItem $productVariantItem)
     {
+        if ($productVariantItem->product->vendor_id !== auth()->user()->vendor->id) {
+            abort(404);
+        }
+
         $request->validate([
             'product_id' => ['required', 'integer'],
             'variant_id' => ['required', 'integer'],
@@ -86,6 +97,12 @@ class VendorProductVariantItemController extends Controller
     public function destroy($itemId)
     {
         $item = ProductVariantItem::findOrFail($itemId);
+
+        if ($item->product->vendor_id !== auth()->user()->vendor->id) {
+            abort(404);
+        }
+
+
         $item->delete();
 
         return response()->json([
@@ -97,8 +114,12 @@ class VendorProductVariantItemController extends Controller
 
     public function changeStatus(Request $request)
     {
-        $brand = ProductVariantItem::findOrFail($request->id);
-        $brand->update([
+        $item = ProductVariantItem::findOrFail($request->id);
+        if ($item->product->vendor_id !== auth()->user()->vendor->id) {
+            abort(404);
+        }
+
+        $item->update([
             'status' => $request->status == 'true' ? 1 : 0,
         ]);
 

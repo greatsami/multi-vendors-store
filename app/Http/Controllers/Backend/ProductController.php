@@ -58,7 +58,7 @@ class ProductController extends Controller
         $data['thumb_image'] = $this->uploadImage($request, 'image', 'uploads/products');
         $data['name'] = $request->name;
         $data['slug'] = Str::slug($request->name);
-        $data['vendor_id'] = auth()->user()->vendor->id;
+        //$data['vendor_id'] = auth()->user()->vendor->id;
         $data['category_id'] = $request->category;
         $data['sub_category_id'] = $request->sub_category;
         $data['child_category_id'] = $request->child_category;
@@ -74,7 +74,7 @@ class ProductController extends Controller
         $data['offer_end_date'] = $request->offer_end_date;
         $data['product_type'] = $request->product_type;
         $data['status'] = $request->status;
-        $data['is_approved'] = 1;
+        // $data['is_approved'] = 1;
         $data['seo_title'] = $request->seo_title;
         $data['seo_description'] = $request->seo_description;
 

@@ -41,3 +41,7 @@ Route::get('product-variant-items/{productId}/{variantId}/index', [Backend\Produ
 Route::get('product-variant-items/{productId}/{variantId}/create', [Backend\ProductVariantItemController::class, 'create'])->name('product-variant-items.create');
 Route::put('product-variant-items/change-status', [Backend\ProductVariantItemController::class, 'changeStatus'])->name('product-variant-items.change-status');
 Route::resource('product-variant-items', Backend\ProductVariantItemController::class)->except('index', 'create');
+
+Route::get('seller-products', [Backend\SellerProductController::class, 'index'])->name('seller-products.index');
+Route::get('seller-pending-products', [Backend\SellerProductController::class, 'pendingProducts'])->name('seller-pending-products.index');
+Route::put('seller-pending-products/change-approve-status', [Backend\SellerProductController::class, 'changeApproveStatus'])->name('seller-pending-products.change-approve-status');

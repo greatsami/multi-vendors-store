@@ -162,7 +162,28 @@ class VendorProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        //
+        if ($product->vendor_id !== auth()->user()->vendor->id) {
+            abort(404);
+        }
+
+        $this->deleteImage($product->thumb_image);
+
+        $galleryImages = $product->images()->get();
+        foreach ($galleryImages as $galleryImage) {
+            $this->deleteImage(public_path('uploads/products/'.$galleryImage));
+            $galleryImage->delete();
+        }
+
+        $variants = $product->variants()->get();
+        foreach ($variants as $variant) {
+            $variant->items()->delete();
+            $variant->delete();
+        }
+        $product->delete();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Deleted Successfully',
+        ]);
     }
 
     public function changeStatus(Request $request)

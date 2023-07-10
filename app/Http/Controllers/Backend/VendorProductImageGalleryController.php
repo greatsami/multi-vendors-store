@@ -20,6 +20,10 @@ class VendorProductImageGalleryController extends Controller
     public function index(Request $request, VendorProductImageGalleryDataTable $dataTable)
     {
         $product = Product::findOrFail($request->product);
+        if ($product->vendor_id !== auth()->user()->vendor->id) {
+            abort(404);
+        }
+
         return $dataTable->render('vendor.products.image-gallery.index', compact('product'));
     }
 
@@ -82,6 +86,11 @@ class VendorProductImageGalleryController extends Controller
     public function destroy(string $id)
     {
         $productImage =ProductImageGallery::findOrFail($id);
+        if ($productImage->product->vendor_id !== auth()->user()->vendor->id) {
+            abort(404);
+        }
+
+
         $this->deleteImage(public_path('uploads/products/'.$productImage->image));
         $productImage->delete();
 

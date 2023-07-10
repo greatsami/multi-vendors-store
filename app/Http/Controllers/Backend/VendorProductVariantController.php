@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Backend;
 
-use App\DataTables\ProductVariantDataTable;
+use App\DataTables\VendorProductVariantDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductVariant;
@@ -14,9 +14,13 @@ class VendorProductVariantController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request, ProductVariantDataTable $dataTable)
+    public function index(Request $request, VendorProductVariantDataTable $dataTable)
     {
         $product = Product::findOrFail($request->product);
+        if ($product->vendor_id !== auth()->user()->vendor->id) {
+            abort(404);
+        }
+
         return $dataTable->render('vendor.products.variants.index', compact('product'));
     }
 
@@ -58,6 +62,10 @@ class VendorProductVariantController extends Controller
      */
     public function edit(ProductVariant $productVariant)
     {
+        if ($productVariant->product->vendor_id !== auth()->user()->vendor->id) {
+            abort(404);
+        }
+
         return view('vendor.products.variants.edit', compact('productVariant'));
     }
 
@@ -66,6 +74,10 @@ class VendorProductVariantController extends Controller
      */
     public function update(Request $request, ProductVariant $productVariant)
     {
+        if ($productVariant->product->vendor_id !== auth()->user()->vendor->id) {
+            abort(404);
+        }
+
         $data = $request->validate([
             'name' => ['required', 'max:200'],
             'product_id' => ['required', 'integer'],
@@ -83,6 +95,10 @@ class VendorProductVariantController extends Controller
      */
     public function destroy(ProductVariant $productVariant)
     {
+        if ($productVariant->product->vendor_id !== auth()->user()->vendor->id) {
+            abort(404);
+        }
+
         $variantItemsCheck = ProductVariantItem::whereProductVariantId($productVariant->id)->count();
         if ($variantItemsCheck > 0) {
             return response()->json([
@@ -100,6 +116,11 @@ class VendorProductVariantController extends Controller
     public function changeStatus(Request $request)
     {
         $variant = ProductVariant::findOrFail($request->id);
+        if ($variant->product->vendor_id !== auth()->user()->vendor->id) {
+            abort(404);
+        }
+
+
         $variant->update([
             'status' => $request->status == 'true' ? 1 : 0,
         ]);
